@@ -2,7 +2,8 @@
 Generuje pliki Mp3 na podstawie wpisanego tekstu.
 
 Wymaga:
-* PHP >= 5.4 && Composer
+* PHP >= 5.4
+* Composer
 * SOX + obsługa MP3
 * Dostęp do API Ivony
 
@@ -13,3 +14,5 @@ define('IVONA_API_SECRET_KEY', '');
 define('IVONA_API_REGION', '');
 define('SOX_PATH', '');
 ```
+
+Skrypt uruchamiamy przez web server (np. Wamp) otrzymujemy wówczas formatkę do tworzenia audio cytatów.
