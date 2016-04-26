@@ -1,0 +1,10 @@
+{
+	"config": {
+        "vendor-dir": "plugins"
+    },
+    "require": {
+		"php": ">=5.4.0",
+        "werd/ivona-speechcloud-sdk-php": "*",
+        "twbs/bootstrap": "*"
+    }
+}
