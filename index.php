@@ -8,6 +8,22 @@ use Werd\Ivona\Models\Voice;
 require_once __DIR__ . '/plugins/autoload.php';
 require_once __DIR__ . '/config.php';
 
+if (file_exists(__DIR__ . '/temp') === false) {
+	if (mkdir(__DIR__ . '/temp') === false) {
+		die('Nie mogę stworzyć katalogu `temp`.');
+	}
+}
+if (file_exists(__DIR__ . '/output') === false) {
+	if (mkdir(__DIR__ . '/output') === false) {
+		die('Nie mogę stworzyć katalogu `output`.');
+	}
+}
+
+$history = [];
+if (file_exists(__DIR__ . '/output/history.json')) {
+	$history = json_decode(file_get_contents(__DIR__ . '/output/history.json'), true);
+}
+
 $requestRoot = strtr($_SERVER['REQUEST_URI'], [$_SERVER['SCRIPT_NAME'] => '']);
 $bootstrapPath = $requestRoot . 'plugins/twbs/bootstrap/dist/';
 if (array_key_exists('form', $_POST) && (int) $_POST['form'] === 1) {
@@ -38,6 +54,12 @@ if (array_key_exists('form', $_POST) && (int) $_POST['form'] === 1) {
 			exec('"' . SOX_PATH . '" "' . $outputFile . '" "' . $outputFile . '" "' . $tempFile . '" "' . $outputFile . '"');
 			unlink($tempFile);
 		}
+		array_push($history, [
+			'quote' => $quote,
+			'filename' => $filename,
+			'timestamp' => time()
+		]);
+		file_put_contents(file_get_contents(__DIR__ . '/output/history.json', json_encode($history)));
 	}
 }
 if (array_key_exists('output', $_GET) && strlen($_GET['output'])) {
@@ -105,6 +127,16 @@ if (array_key_exists('output', $_GET) && strlen($_GET['output'])) {
 				</audio>
 			</p>
 		</div></div><?php
+	}
+	if (count($history)) {
+		echo '<div class="row"><div class="col-xs-12"><ul class="list-unstyled">';
+		foreach (array_reverse($history) as $record) {
+			$audioPath = $requestRoot . '?output=' . $record['filename'];
+			echo '<li>' . htmlspecialchars($record['quote']) . ' <span class="text-mute">'
+				. date('d-m-Y H:i:s', $record['timestamp']) . '</span> '
+				. '<a href="' . $audioPath . '" target="_blank"><i class="glyphicon glyphicon-play"></i></a></li>';
+		}
+		echo '</ul></div></div>';
 	}
 	?>
 </div>
