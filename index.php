@@ -48,10 +48,10 @@ if (array_key_exists('form', $_POST) && (int) $_POST['form'] === 1) {
 		$tempFile = __DIR__ . '/temp/' . $filename;
 		$outputFile = __DIR__ . '/output/' . $filename;
 		file_put_contents($outputFile, $data);
-		if (file_exists(SOX_PATH) && is_executable(SOX_PATH)) {
-			exec('"' . SOX_PATH . '" "' . $outputFile . '" "' . $outputFile . '" pad 0 1');
-			exec('"' . SOX_PATH . '" "' . $outputFile . '" "' . $tempFile . '" tempo 0.5');
-			exec('"' . SOX_PATH . '" "' . $outputFile . '" "' . $outputFile . '" "' . $tempFile . '" "' . $outputFile . '"');
+		if (strlen(SOX_PATH)) {
+			shell_exec(SOX_PATH . ' "' . $outputFile . '" "' . $tempFile . '" pad 0 1');
+			shell_exec(SOX_PATH . ' "' . $outputFile . '" "' . $tempFile . '" tempo 0.5');
+			shell_exec(SOX_PATH . ' "' . $outputFile . '" "' . $outputFile . '" "' . $tempFile . '" "' . $outputFile . '"');
 			unlink($tempFile);
 		}
 		array_push($history, [
@@ -59,7 +59,7 @@ if (array_key_exists('form', $_POST) && (int) $_POST['form'] === 1) {
 			'filename' => $filename,
 			'timestamp' => time()
 		]);
-		file_put_contents(file_get_contents(__DIR__ . '/output/history.json', json_encode($history)));
+		file_put_contents(__DIR__ . '/output/history.json', json_encode($history));
 	}
 }
 if (array_key_exists('output', $_GET) && strlen($_GET['output'])) {
