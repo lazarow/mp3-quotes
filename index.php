@@ -33,7 +33,7 @@ if (array_key_exists('form', $_POST) && (int) $_POST['form'] === 1) {
 		&& strlen($_POST['quote']) < 50)
 	{
 		$quote = trim($_POST['quote']);
-		$filename = md5($quote) . '.mp3';
+		$filename = md5($quote . time()) . '.mp3';
 		$speechCloud = new SpeechCloud([
 			'access_key' => IVONA_API_ACCESS_KEY,
 			'secret_key' => IVONA_API_SECRET_KEY,
@@ -49,7 +49,7 @@ if (array_key_exists('form', $_POST) && (int) $_POST['form'] === 1) {
 		$outputFile = __DIR__ . '/output/' . $filename;
 		file_put_contents($outputFile, $data);
 		if (strlen(SOX_PATH)) {
-			shell_exec(SOX_PATH . ' "' . $outputFile . '" "' . $tempFile . '" pad 0 1');
+			shell_exec(SOX_PATH . ' "' . $outputFile . '" "' . $outputFile . '" pad 0 1');
 			shell_exec(SOX_PATH . ' "' . $outputFile . '" "' . $tempFile . '" tempo 0.5');
 			shell_exec(SOX_PATH . ' "' . $outputFile . '" "' . $outputFile . '" "' . $tempFile . '" "' . $outputFile . '"');
 			unlink($tempFile);
@@ -132,8 +132,8 @@ if (array_key_exists('output', $_GET) && strlen($_GET['output'])) {
 		echo '<div class="row"><div class="col-xs-12"><ul class="list-unstyled">';
 		foreach (array_reverse($history) as $record) {
 			$audioPath = $requestRoot . '?output=' . $record['filename'];
-			echo '<li>' . htmlspecialchars($record['quote']) . ' <span class="text-mute">'
-				. date('d-m-Y H:i:s', $record['timestamp']) . '</span> '
+			echo '<li>' . htmlspecialchars($record['quote']) . ' / <span class="text-muted">'
+				. date('d.m.Y H:i:s', $record['timestamp']) . '</span> / '
 				. '<a href="' . $audioPath . '" target="_blank"><i class="glyphicon glyphicon-play"></i></a></li>';
 		}
 		echo '</ul></div></div>';
